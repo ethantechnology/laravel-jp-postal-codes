@@ -1,5 +1,5 @@
 {
-    "name": "laravel-jp-postal-codes",
+    "name": "ethantechnology/laraveljp-postal-codes",
     "description": "Laravel package for Japanese prefectures and postal codes",
     "type": "library",
     "license": "MIT",
