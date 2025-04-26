@@ -10,7 +10,7 @@ Laravel package for Japanese prefectures and postal codes. The data is imported 
 ## Installation
 
 ```bash
-composer require ethantechnology/laraveljp-postal-codes
+composer require ethantechnology/laravel-jp-postal-codes
 ```
 
 ### Service Provider Registration
