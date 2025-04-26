@@ -2,7 +2,7 @@
 
 namespace Eta\JpPostalCodes;
 
-use Eta\JpPostalCodes\Commands\ImportPostalCodesCommand;
+use Eta\JpPostalCodes\Commands\UpdatePostalCodesCommand;
 use Illuminate\Support\ServiceProvider;
 
 class JpPostalCodesServiceProvider extends ServiceProvider
@@ -22,7 +22,7 @@ class JpPostalCodesServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             // Register commands
             $this->commands([
-                ImportPostalCodesCommand::class,
+                UpdatePostalCodesCommand::class,
             ]);
             
             // Publish config file

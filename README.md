@@ -1,6 +1,6 @@
 # Japanese Postal Codes
 
-Laravel package for Japanese prefectures and postal codes.
+Laravel package for Japanese prefectures and postal codes. The data is imported from the official Japan Post service.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ Laravel package for Japanese prefectures and postal codes.
 ## Installation
 
 ```bash
-composer require laravel-jp-postal-codes
+composer require ethantechnology/laraveljp-postal-codes
 ```
 
 ### Service Provider Registration
@@ -36,7 +36,7 @@ php artisan vendor:publish --tag=jp-postal-codes-config
 ```
 
 This will create a `config/jp-postal-codes.php` file where you can:
-- Change the table names for prefectures and postal codes
+- Change the table names for prefectures, cities, and postal codes
 - Modify the URL for downloading postal code data
 - Adjust import settings like chunk size
 
@@ -52,34 +52,30 @@ php artisan migrate
 
 This will create the following tables:
 - `jp_prefectures`: Contains all Japanese prefectures (or your custom table name if configured)
-- `jp_postal_codes`: Contains Japanese postal codes with their corresponding prefectures (or your custom table name if configured)
+- `jp_cities`: Contains all Japanese cities/municipalities (or your custom table name if configured)
+- `jp_postal_codes`: Contains Japanese postal codes with their corresponding prefectures and cities (or your custom table name if configured)
 
-## Import Data
+## Updating Postal Code Data
 
-You can import all prefectures and postal codes data using:
-
-```bash
-php artisan jp-postal-codes:import
-```
-
-To import only prefectures:
+To download and update all data from the official Japan Post service:
 
 ```bash
-php artisan jp-postal-codes:import --only-prefectures
+php artisan jp-postal-codes:update
 ```
 
-To import only postal codes (requires internet connection):
+This command will:
+1. Download the latest postal code data from Japan Post
+2. Clean all existing data in the tables
+3. Import the postal codes
+4. Automatically extract and create prefectures and cities from the postal code data
 
-```bash
-php artisan jp-postal-codes:import --only-postal-codes
-```
-
-Note: Postal code import downloads data from a public source and might take some time to complete.
+Note: This process downloads data from the official Japan Post service and might take some time to complete. The data is provided in Shift-JIS encoding and will be automatically converted to UTF-8 during import.
 
 ## Usage
 
 ```php
 use Eta\JpPostalCodes\Models\Prefecture;
+use Eta\JpPostalCodes\Models\City;
 use Eta\JpPostalCodes\Models\PostalCode;
 
 // Get all prefectures
@@ -88,10 +84,24 @@ $prefectures = Prefecture::all();
 // Find prefecture by ID
 $tokyo = Prefecture::find(13);
 
+// Get all cities in a prefecture
+$tokyoCities = $tokyo->cities;
+
+// Find city by ID
+$shinjuku = City::find('13104');
+
+// Get the prefecture for a city
+$prefecture = $shinjuku->prefecture;
+
 // Find location by postal code
-$locations = PostalCode::where('postal_code', '1000001')->get();
+$locations = PostalCode::where('postal_code', '1600022')->get();
 // Or using the scope
-$locations = PostalCode::postal('1000001')->get();
+$locations = PostalCode::postal('1600022')->get();
+
+// Get the city and prefecture for a postal code
+$location = PostalCode::postal('1600022')->first();
+$city = $location->city;
+$prefecture = $location->prefecture;
 ```
 
 ## Custom Table Names
@@ -103,6 +113,7 @@ After publishing the config file, you can modify the table names:
 return [
     'tables' => [
         'prefectures' => 'custom_prefectures',
+        'cities' => 'custom_cities',
         'postal_codes' => 'custom_postal_codes',
     ],
     // ...

@@ -15,17 +15,17 @@ class PostalCodeService
     /**
      * ZIP file name.
      */
-    public const ZIP_FILE_NAME = 'csv_zenkoku.zip';
+    public const ZIP_FILE_NAME = 'ken_all.zip';
 
     /**
      * CSV file name inside the ZIP.
      */
-    public const CSV_FILE_NAME = 'zenkoku.csv';
+    public const CSV_FILE_NAME = 'KEN_ALL.CSV';
 
     /**
      * Character encodings to try when converting CSV data.
      */
-    public const CHARACTER_CODE_FROM = ['SJIS-win', 'UTF-8', 'CP932'];
+    public const CHARACTER_CODE_FROM = ['SJIS-win', 'CP932', 'UTF-8'];
 
     /**
      * Target character encoding for CSV data.
@@ -94,7 +94,7 @@ class PostalCodeService
     public function __construct(Client $httpClient = null)
     {
         $this->httpClient = $httpClient ?? new Client();
-        $this->downloadUrl = config('jp-postal-codes.postal_code_url', 'http://jusyo.jp/downloads/new/csv/csv_zenkoku.zip');
+        $this->downloadUrl = config('jp-postal-codes.postal_code_url', 'https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip');
         
         $zipFileDir = storage_path('app/jp-postal-codes/');
         
@@ -200,126 +200,149 @@ class PostalCodeService
         $this->zip = new ZipArchive();
         
         if ($this->zip->open($this->zipFilePath) !== true) {
-            throw new DownloadErrorException('Failed to open ZIP file: ' . $this->zipFilePath . ' (downloaded from ' . $this->downloadUrl . ')');
+            throw new DownloadErrorException('Failed to open ZIP file: ' . $this->zipFilePath);
         }
         
-        $this->fp = $this->zip->getStream(self::CSV_FILE_NAME);
+        // Japan Post uses KEN_ALL.CSV
+        $csvIndex = $this->zip->locateName(self::CSV_FILE_NAME);
         
-        if (!$this->fp) {
-            throw new FormatErrorException('Failed to open CSV file "' . self::CSV_FILE_NAME . '" in ZIP archive from ' . $this->downloadUrl);
+        if ($csvIndex === false) {
+            throw new FormatErrorException('CSV file not found in ZIP: ' . self::CSV_FILE_NAME);
+        }
+        
+        $csvContent = $this->zip->getFromIndex($csvIndex);
+        
+        // Convert encoding from Shift-JIS to UTF-8
+        $encodingDetected = false;
+        foreach (self::CHARACTER_CODE_FROM as $encoding) {
+            $utf8Content = mb_convert_encoding($csvContent, self::CHARACTER_CODE_TO, $encoding);
+            if ($utf8Content !== false) {
+                $encodingDetected = true;
+                break;
+            }
+        }
+        
+        if (!$encodingDetected) {
+            throw new FormatErrorException('Failed to convert CSV encoding');
+        }
+        
+        // Create a temporary file with UTF-8 content
+        $tempFile = tempnam(sys_get_temp_dir(), 'postal_code_');
+        file_put_contents($tempFile, $utf8Content);
+        
+        // Open the file for reading
+        $this->fp = fopen($tempFile, 'r');
+        
+        if ($this->fp === false) {
+            throw new FormatErrorException('Failed to open CSV file');
         }
     }
-
+    
     /**
-     * Parse CSV data to an array of objects.
+     * Convert CSV data to array of objects.
      *
      * @return array
      * @throws FormatErrorException
      */
     private function csvToArray()
     {
-        $resultArr = [];
+        if ($this->fp === null || feof($this->fp)) {
+            $this->isLast = true;
+            return [];
+        }
         
-        for ($i = 0; $i < self::CHUNK; $i++) {
-            // Get a line from the CSV file
-            $line = fgets($this->fp);
-            
-            // Check if end of file or invalid data
-            if ($line === false) {
-                if ($this->count > 0) {
-                    break;
-                }
-                throw new FormatErrorException('Invalid CSV format in file from ' . $this->downloadUrl);
+        $result = [];
+        $i = 0;
+        
+        while ($i < self::CHUNK && ($line = fgetcsv($this->fp)) !== false) {
+            if (count($line) < 1) {
+                continue;
             }
             
-            // Convert encoding
-            $line = mb_convert_encoding($line, self::CHARACTER_CODE_TO, self::CHARACTER_CODE_FROM);
-            $line = str_replace('"', '', $line);
-            
-            // Skip header row
-            if ($this->count !== 0 && !empty($line)) {
-                $this->processLine($line, $resultArr);
+            $obj = $this->processLine($line);
+            if ($obj) {
+                $result[] = $obj;
+                $i++;
             }
             
             $this->count++;
         }
         
-        // Check if we've reached the end of the file
         if (feof($this->fp)) {
+            $this->isLast = true;
             $this->closeResources();
         }
         
-        return $resultArr;
+        return $result;
     }
-
+    
     /**
-     * Process a single CSV line.
+     * Process a CSV line into an object.
      *
-     * @param string $line
-     * @param array $resultArr
-     * @return void
+     * @param array $line
+     * @return stdClass|null
      */
-    private function processLine($line, array &$resultArr)
+    private function processLine(array $line)
     {
-        $data = explode(',', $line);
-        
-        // Ensure we have at least the minimum required fields
-        if (count($data) < 8) {
-            return;
+        // Japan Post CSV format has 15 columns
+        if (count($line) < 15) {
+            return null;
         }
         
         $obj = new stdClass();
         
-        // Map CSV fields to object properties
-        $obj->addressCode = $data[0] ?? null;
-        $obj->prefectureCode = $data[1] ?? null;
-        $obj->cityCode = $data[2] ?? null;
-        $obj->areaCode = $data[3] ?? null;
-        $obj->postalCode = $data[4] ?? null;
-        $obj->isOffice = isset($data[5]) ? (int)$data[5] === 1 : false;
-        $obj->isClosed = isset($data[6]) ? (int)$data[6] === 1 : false;
-        $obj->prefecture = $data[7] ?? null;
-        $obj->prefectureKana = $data[8] ?? null;
-        $obj->city = $data[9] ?? null;
-        $obj->cityKana = $data[10] ?? null;
-        $obj->area = $data[11] ?? null;
-        $obj->areaKana = $data[12] ?? null;
-        $obj->areaInfo = $data[13] ?? null;
-        $obj->kyotoRoadName = $data[14] ?? null;
-        $obj->chome = $data[15] ?? null;
-        $obj->chomeKana = $data[16] ?? null;
-        $obj->info = $data[17] ?? null;
-        $obj->officeName = $data[18] ?? null;
-        $obj->officeNameKana = $data[19] ?? null;
-        $obj->officeAddress = $data[20] ?? null;
-        $obj->newAddressCode = $data[21] ?? null;
+        // Map data from Japan Post CSV format to our model
+        $obj->addressCode = $line[0]; // 全国地方公共団体コード
+        $obj->prefectureCode = (int)substr($line[0], 0, 2); // 都道府県コード (最初の2桁)
+        $obj->cityCode = (int)substr($line[0], 0, 5); // 市区町村コード (最初の5桁)
+        $obj->areaCode = (int)$line[0]; // 町域コード (全体)
+        $obj->postalCode = $line[2]; // 郵便番号
+        $obj->prefecture = $line[6]; // 都道府県名
+        $obj->prefectureKana = $line[3]; // 都道府県名カナ
+        $obj->city = $line[7]; // 市区町村名
+        $obj->cityKana = $line[4]; // 市区町村名カナ
+        $obj->area = $line[8]; // 町域名
+        $obj->areaKana = $line[5]; // 町域名カナ
         
-        $resultArr[] = $obj;
-    }
-
-    /**
-     * Close file resources.
-     *
-     * @return void
-     */
-    private function closeResources()
-    {
-        fclose($this->fp);
-        $this->zip->close();
-        $this->isLast = true;
+        // フラグ情報
+        $obj->isOffice = false; // 事業所フラグ (KEN_ALL.CSVには含まれていない)
+        $obj->isClosed = false; // 廃止フラグ (KEN_ALL.CSVには含まれていない)
+        
+        // その他の情報
+        $obj->areaInfo = '';
+        $obj->kyotoRoadName = '';
+        $obj->chome = '';
+        $obj->chomeKana = '';
+        $obj->info = '';
+        $obj->officeName = '';
+        $obj->officeNameKana = '';
+        $obj->officeAddress = '';
+        $obj->newAddressCode = '';
+        
+        return $obj;
     }
     
     /**
-     * Destructor: Ensure resources are closed.
+     * Close file resources.
+     */
+    private function closeResources()
+    {
+        if ($this->fp) {
+            fclose($this->fp);
+            $this->fp = null;
+        }
+        
+        if ($this->zip) {
+            $this->zip->close();
+            $this->zip = null;
+        }
+    }
+    
+    /**
+     * Destructor to ensure resources are closed.
      */
     public function __destruct()
     {
-        if ($this->fp && is_resource($this->fp)) {
-            fclose($this->fp);
-        }
-        
-        if ($this->zip instanceof ZipArchive) {
-            $this->zip->close();
-        }
+        $this->closeResources();
     }
 }

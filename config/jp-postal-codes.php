@@ -13,6 +13,7 @@ return [
     
     'tables' => [
         'prefectures' => 'jp_prefectures',
+        'cities' => 'jp_cities',
         'postal_codes' => 'jp_postal_codes',
     ],
     
@@ -25,7 +26,7 @@ return [
     |
     */
     
-    'postal_code_url' => 'http://jusyo.jp/downloads/new/csv/csv_zenkoku.zip',
+    'postal_code_url' => 'https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip',
     
     /*
     |--------------------------------------------------------------------------

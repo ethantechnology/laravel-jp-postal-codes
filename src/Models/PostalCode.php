@@ -4,6 +4,7 @@ namespace Eta\JpPostalCodes\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PostalCode extends Model
 {
@@ -59,6 +60,26 @@ class PostalCode extends Model
      * @var array
      */
     protected $fillable = self::COLUMNS;
+
+    /**
+     * Get the prefecture that this postal code belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function prefecture(): BelongsTo
+    {
+        return $this->belongsTo(Prefecture::class, 'prefecture_code', 'id');
+    }
+
+    /**
+     * Get the city that this postal code belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'city_code', 'id');
+    }
 
     /**
      * 郵便番号一致のスコープ

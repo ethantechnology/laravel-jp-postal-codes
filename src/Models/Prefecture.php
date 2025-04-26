@@ -50,8 +50,18 @@ class Prefecture extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function postalCodes()
+    public function postalCodes(): HasMany
     {
-        return $this->hasMany(PostalCode::class, 'prefecture', 'code');
+        return $this->hasMany(PostalCode::class, 'prefecture_code', 'id');
+    }
+
+    /**
+     * Get the cities for the prefecture.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cities(): HasMany
+    {
+        return $this->hasMany(City::class);
     }
 } 
