@@ -112,7 +112,9 @@ class UpdatePostalCodesCommand extends Command
         $this->info('This may take a while as data will be downloaded and processed from: ' . $postalCodeService->getDownloadUrl());
         
         try {
-            $bar = $this->output->createProgressBar();
+            // Estimate total records (approx 124,000 for Japan Post dataset)
+            $estimatedTotal = 125000;
+            $bar = $this->output->createProgressBar($estimatedTotal);
             $bar->start();
             
             $totalInserted = 0;
@@ -195,9 +197,16 @@ class UpdatePostalCodesCommand extends Command
             ];
         })->toArray();
         
+        // Create progress bar for prefectures (though it's a small dataset)
+        $bar = $this->output->createProgressBar(1);
+        $bar->start();
+        
         // Bulk insert all prefectures
         Prefecture::upsert($prefectureRecords, ['id'], ['name', 'updated_at']);
+        $bar->advance();
         
+        $bar->finish();
+        $this->newLine();
         $this->info('Successfully generated ' . count($prefectureRecords) . ' prefectures from postal code data.');
     }
     
@@ -235,11 +244,20 @@ class UpdatePostalCodesCommand extends Command
             ];
         })->toArray();
         
-        // Bulk insert all cities in chunks to avoid memory issues
-        collect($cityRecords)->chunk(1000)->each(function ($chunk) {
-            City::upsert($chunk->toArray(), ['id'], ['prefecture_id', 'name', 'updated_at']);
-        });
+        // Create progress bar for cities
+        $totalChunks = ceil(count($cityRecords) / 1000);
+        $bar = $this->output->createProgressBar($totalChunks);
+        $bar->start();
         
+        // Bulk insert all cities in chunks to avoid memory issues
+        $chunks = array_chunk($cityRecords, 1000);
+        foreach ($chunks as $chunk) {
+            City::upsert($chunk, ['id'], ['prefecture_id', 'name', 'updated_at']);
+            $bar->advance();
+        }
+        
+        $bar->finish();
+        $this->newLine();
         $this->info('Successfully generated ' . count($cityRecords) . ' cities from postal code data.');
     }
 }

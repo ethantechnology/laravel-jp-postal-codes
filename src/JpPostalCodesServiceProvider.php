@@ -14,9 +14,6 @@ class JpPostalCodesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Load migrations directly instead of publishing
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        
         if ($this->app->runningInConsole()) {
             // Register commands
             $this->commands([
