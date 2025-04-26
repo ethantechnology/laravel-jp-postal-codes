@@ -1,10 +1,10 @@
 <?php
 
-namespace Eta\JapanRegions\Services;
+namespace Eta\JpPostalCodes\Services;
 
 use ZipArchive;
-use Eta\JapanRegions\Exceptions\DownloadErrorException;
-use Eta\JapanRegions\Exceptions\FormatErrorException;
+use Eta\JpPostalCodes\Exceptions\DownloadErrorException;
+use Eta\JpPostalCodes\Exceptions\FormatErrorException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
@@ -94,9 +94,9 @@ class PostalCodeService
     public function __construct(Client $httpClient = null)
     {
         $this->httpClient = $httpClient ?? new Client();
-        $this->downloadUrl = config('japan-regions.postal_code_url', 'http://jusyo.jp/downloads/new/csv/csv_zenkoku.zip');
+        $this->downloadUrl = config('jp-postal-codes.postal_code_url', 'http://jusyo.jp/downloads/new/csv/csv_zenkoku.zip');
         
-        $zipFileDir = storage_path('app/japan-regions/');
+        $zipFileDir = storage_path('app/jp-postal-codes/');
         
         if (!file_exists($zipFileDir)) {
             mkdir($zipFileDir, 0755, true);

@@ -1,5 +1,5 @@
 {
-    "name": "laravel-japan-regions",
+    "name": "laravel-jp-postal-codes",
     "description": "Laravel package for Japanese prefectures and postal codes",
     "type": "library",
     "license": "MIT",
@@ -37,18 +37,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Eta\\JapanRegions\\": "src/"
+            "Eta\\JpPostalCodes\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Eta\\JapanRegions\\Tests\\": "tests/"
+            "Eta\\JpPostalCodes\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Eta\\JapanRegions\\JapanRegionsServiceProvider"
+                "Eta\\JpPostalCodes\\JpPostalCodesServiceProvider"
             ]
         }
     }

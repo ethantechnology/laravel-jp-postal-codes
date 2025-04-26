@@ -1,6 +1,6 @@
 <?php
 
-namespace Eta\JapanRegions\Models;
+namespace Eta\JpPostalCodes\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +23,7 @@ class Prefecture extends Model
         parent::__construct($attributes);
         
         // Set table name from config
-        $this->setTable(config('japan-regions.tables.prefectures', 'jp_prefectures'));
+        $this->setTable(config('jp-postal-codes.tables.prefectures', 'jp_prefectures'));
     }
 
     /**

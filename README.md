@@ -1,4 +1,4 @@
-# Japan Regions
+# Japanese Postal Codes
 
 Laravel package for Japanese prefectures and postal codes.
 
@@ -10,7 +10,7 @@ Laravel package for Japanese prefectures and postal codes.
 ## Installation
 
 ```bash
-composer require laravel-japan-regions
+composer require laravel-jp-postal-codes
 ```
 
 ### Service Provider Registration
@@ -24,7 +24,7 @@ If you're using Laravel 5.5 or higher, the package will automatically register i
 If you're using Laravel 5.4 or below, you need to manually register the service provider. Add the following line to the `providers` array in your `config/app.php` file:
 
 ```php
-Eta\JapanRegions\JapanRegionsServiceProvider::class,
+Eta\JpPostalCodes\JpPostalCodesServiceProvider::class,
 ```
 
 ## Configuration
@@ -32,10 +32,10 @@ Eta\JapanRegions\JapanRegionsServiceProvider::class,
 To customize the table names and other settings, publish the configuration file:
 
 ```bash
-php artisan vendor:publish --tag=japan-regions-config
+php artisan vendor:publish --tag=jp-postal-codes-config
 ```
 
-This will create a `config/japan-regions.php` file where you can:
+This will create a `config/jp-postal-codes.php` file where you can:
 - Change the table names for prefectures and postal codes
 - Modify the URL for downloading postal code data
 - Adjust import settings like chunk size
@@ -59,19 +59,19 @@ This will create the following tables:
 You can import all prefectures and postal codes data using:
 
 ```bash
-php artisan japan-regions:import
+php artisan jp-postal-codes:import
 ```
 
 To import only prefectures:
 
 ```bash
-php artisan japan-regions:import --only-prefectures
+php artisan jp-postal-codes:import --only-prefectures
 ```
 
 To import only postal codes (requires internet connection):
 
 ```bash
-php artisan japan-regions:import --only-postal-codes
+php artisan jp-postal-codes:import --only-postal-codes
 ```
 
 Note: Postal code import downloads data from a public source and might take some time to complete.
@@ -79,8 +79,8 @@ Note: Postal code import downloads data from a public source and might take some
 ## Usage
 
 ```php
-use Eta\JapanRegions\Models\Prefecture;
-use Eta\JapanRegions\Models\PostalCode;
+use Eta\JpPostalCodes\Models\Prefecture;
+use Eta\JpPostalCodes\Models\PostalCode;
 
 // Get all prefectures
 $prefectures = Prefecture::all();
@@ -99,7 +99,7 @@ $locations = PostalCode::postal('1000001')->get();
 After publishing the config file, you can modify the table names:
 
 ```php
-// config/japan-regions.php
+// config/jp-postal-codes.php
 return [
     'tables' => [
         'prefectures' => 'custom_prefectures',

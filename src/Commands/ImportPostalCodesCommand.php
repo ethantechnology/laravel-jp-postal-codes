@@ -1,22 +1,22 @@
 <?php
 
-namespace Eta\JapanRegions\Commands;
+namespace Eta\JpPostalCodes\Commands;
 
-use Eta\JapanRegions\Models\Prefecture;
-use Eta\JapanRegions\Models\PostalCode;
-use Eta\JapanRegions\Services\PostalCodeService;
+use Eta\JpPostalCodes\Models\Prefecture;
+use Eta\JpPostalCodes\Models\PostalCode;
+use Eta\JpPostalCodes\Services\PostalCodeService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class ImportJapanRegionsCommand extends Command
+class ImportPostalCodesCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'japan-regions:import {--only-prefectures : Import only prefectures data} {--only-postal-codes : Import only postal codes data}';
+    protected $signature = 'jp-postal-codes:import {--only-prefectures : Import only prefectures data} {--only-postal-codes : Import only postal codes data}';
 
     /**
      * The console command description.
@@ -51,10 +51,10 @@ class ImportJapanRegionsCommand extends Command
             $this->info('Import completed successfully!');
             
             // Display publish instructions if config file doesn't exist
-            if (!file_exists(config_path('japan-regions.php'))) {
+            if (!file_exists(config_path('jp-postal-codes.php'))) {
                 $this->comment('');
                 $this->comment('To customize table names, publish the config file:');
-                $this->comment('php artisan vendor:publish --tag=japan-regions-config');
+                $this->comment('php artisan vendor:publish --tag=jp-postal-codes-config');
             }
             
             return Command::SUCCESS;
@@ -117,7 +117,7 @@ class ImportJapanRegionsCommand extends Command
             $bar->start();
             
             $totalInserted = 0;
-            $chunkSize = config('japan-regions.import.chunk_size', 1000);
+            $chunkSize = config('jp-postal-codes.import.chunk_size', 1000);
             
             DB::beginTransaction();
             

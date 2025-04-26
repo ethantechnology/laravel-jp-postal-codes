@@ -1,6 +1,6 @@
 <?php
 
-namespace Eta\JapanRegions\Exceptions;
+namespace Eta\JpPostalCodes\Exceptions;
 
 use Exception;
 

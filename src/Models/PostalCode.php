@@ -1,6 +1,6 @@
 <?php
 
-namespace Eta\JapanRegions\Models;
+namespace Eta\JpPostalCodes\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,7 +50,7 @@ class PostalCode extends Model
         parent::__construct($attributes);
         
         // Set table name from config
-        $this->setTable(config('japan-regions.tables.postal_codes', 'jp_postal_codes'));
+        $this->setTable(config('jp-postal-codes.tables.postal_codes', 'jp_postal_codes'));
     }
 
     /**
