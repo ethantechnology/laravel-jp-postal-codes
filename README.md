@@ -102,10 +102,10 @@ $tokyo = Prefecture::find(13);
 $tokyoCities = $tokyo->cities;
 
 // Find city by ID
-$shinjuku = City::find('13104');
+$city = City::find('13104');
 
 // Get the prefecture for a city
-$prefecture = $shinjuku->prefecture;
+$prefecture = $city->prefecture;
 
 // Find location by postal code
 $locations = PostalCode::where('postal_code', '1600022')->get();
