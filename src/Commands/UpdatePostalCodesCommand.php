@@ -82,28 +82,15 @@ class UpdatePostalCodesCommand extends Command
      */
     private function tablesExist()
     {
+        // Get table names from config or use defaults
         $postalCodesTable = config('jp-postal-codes.tables.postal_codes', 'jp_postal_codes');
         $prefecturesTable = config('jp-postal-codes.tables.prefectures', 'jp_prefectures');
         $citiesTable = config('jp-postal-codes.tables.cities', 'jp_cities');
         
-        $schema = Schema::getConnection()->getDoctrineSchemaManager();
-        $tables = $schema->listTableNames();
-        
-        $prefix = DB::getTablePrefix();
-        
-        $prefixedTables = [
-            $prefix . $postalCodesTable,
-            $prefix . $prefecturesTable,
-            $prefix . $citiesTable
-        ];
-        
-        foreach ($prefixedTables as $table) {
-            if (!in_array($table, $tables)) {
-                return false;
-            }
-        }
-        
-        return true;
+        // Check if tables exist using Schema facade
+        return Schema::hasTable($postalCodesTable) &&
+            Schema::hasTable($prefecturesTable) &&
+            Schema::hasTable($citiesTable);
     }
 
     /**
