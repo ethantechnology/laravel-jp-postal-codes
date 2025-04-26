@@ -40,11 +40,25 @@ This will create a `config/jp-postal-codes.php` file where you can:
 - Modify the URL for downloading postal code data
 - Adjust import settings like chunk size
 
-> **Important**: If you change table names in the config, make sure to update the corresponding migration files in your `database/migrations` directory before running migrations.
+### Customizing Migrations
+
+Since we no longer automatically load migrations, you need to publish them first:
+
+```bash
+php artisan vendor:publish --tag=jp-postal-codes-migrations
+```
+
+After publishing, you can find and modify the migration files in your `database/migrations` directory. You should customize them before running migrations if you:
+
+1. Changed table names in the config
+2. Need to adjust table structures (add or modify columns)
+3. Want to change indexes or foreign key constraints
+
+> **Important**: Make sure your migration table names match those in the config file. If you change table names in the config, update the corresponding migration files before running migrations.
 
 ## Migration
 
-The package automatically publishes its migrations when installed. After installing and configuring, run:
+After installing and configuring, run:
 
 ```bash
 php artisan migrate
