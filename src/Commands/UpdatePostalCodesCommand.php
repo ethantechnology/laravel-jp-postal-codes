@@ -143,7 +143,7 @@ class UpdatePostalCodesCommand extends Command
                     
                     // Import postal codes in chunks to manage memory
                     if (count($data) >= $chunkSize) {
-                        PostalCode::upsert($data, ['address_code'], PostalCode::COLUMNS);
+                        PostalCode::insert($data);
                         $bar->advance(count($data));
                         $data = [];
                     }
@@ -151,7 +151,7 @@ class UpdatePostalCodesCommand extends Command
                 
                 // Import any remaining postal code records
                 if (!empty($data)) {
-                    PostalCode::upsert($data, ['address_code'], PostalCode::COLUMNS);
+                    PostalCode::insert($data);
                     $bar->advance(count($data));
                 }
             }
@@ -188,26 +188,27 @@ class UpdatePostalCodesCommand extends Command
         }
         
         // Prepare data for bulk insert
-        $prefectureRecords = $prefectures->map(function ($prefecture) {
-            return [
+        $prefectureData = [];
+        foreach ($prefectures as $prefecture) {
+            $prefectureData[] = [
                 'id' => (int)$prefecture->id,
                 'name' => $prefecture->name,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
-        })->toArray();
+        }
         
         // Create progress bar for prefectures (though it's a small dataset)
         $bar = $this->output->createProgressBar(1);
         $bar->start();
         
         // Bulk insert all prefectures
-        Prefecture::upsert($prefectureRecords, ['id'], ['name', 'updated_at']);
+        Prefecture::insert($prefectureData);
         $bar->advance();
         
         $bar->finish();
         $this->newLine();
-        $this->info('Successfully generated ' . count($prefectureRecords) . ' prefectures from postal code data.');
+        $this->info('Successfully generated ' . count($prefectureData) . ' prefectures from postal code data.');
     }
     
     /**
@@ -234,30 +235,31 @@ class UpdatePostalCodesCommand extends Command
         }
         
         // Prepare data for bulk insert
-        $cityRecords = $cities->map(function ($city) {
-            return [
+        $cityData = [];
+        foreach ($cities as $city) {
+            $cityData[] = [
                 'id' => $city->id,
                 'prefecture_id' => (int)$city->prefecture_id,
                 'name' => $city->name,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
-        })->toArray();
+        }
         
         // Create progress bar for cities
-        $totalChunks = ceil(count($cityRecords) / 1000);
+        $totalChunks = ceil(count($cityData) / 1000);
         $bar = $this->output->createProgressBar($totalChunks);
         $bar->start();
         
         // Bulk insert all cities in chunks to avoid memory issues
-        $chunks = array_chunk($cityRecords, 1000);
+        $chunks = array_chunk($cityData, 1000);
         foreach ($chunks as $chunk) {
-            City::upsert($chunk, ['id'], ['prefecture_id', 'name', 'updated_at']);
+            City::insert($chunk);
             $bar->advance();
         }
         
         $bar->finish();
         $this->newLine();
-        $this->info('Successfully generated ' . count($cityRecords) . ' cities from postal code data.');
+        $this->info('Successfully generated ' . count($cityData) . ' cities from postal code data.');
     }
 }
