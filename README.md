@@ -10,7 +10,7 @@ Laravel package for Japanese prefectures and postal codes.
 ## Installation
 
 ```bash
-composer require eta/japan-regions
+composer require laravel-japan-regions
 ```
 
 ### Service Provider Registration
