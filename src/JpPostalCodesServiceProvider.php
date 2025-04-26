@@ -14,10 +14,13 @@ class JpPostalCodesServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Publish migrations - they'll be auto-published on install
+        // Load migrations directly instead of publishing
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        
+        // Keep the publish option for those who want to customize
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'migrations');
+        ], 'jp-postal-codes-migrations');
         
         if ($this->app->runningInConsole()) {
             // Register commands
