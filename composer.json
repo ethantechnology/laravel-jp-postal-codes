@@ -1,15 +1,25 @@
 {
-    "name": "eta/japan-regions",
+    "name": "laravel-japan-regions",
     "description": "Laravel package for Japanese prefectures and postal codes",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "japan",
+        "japanese",
+        "prefectures",
+        "regions",
+        "postal codes",
+        "zip codes",
+        "addresses"
+    ],
     "authors": [
         {
             "name": "ETA",
             "email": "eta@ethan-tech.asia"
         },
         {
-            "name": "HaiHai",
+            "name": "Hai Ho",
             "email": "devhaiho@gmail.com"
         }
     ],
