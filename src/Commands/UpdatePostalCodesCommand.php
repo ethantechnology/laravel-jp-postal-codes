@@ -38,8 +38,14 @@ class UpdatePostalCodesCommand extends Command
         $this->info('Data will be downloaded from official Japan Post service.');
 
         try {
-            DB::beginTransaction();
-            
+            // Check if required tables exist
+            if (!$this->tablesExist()) {
+                $this->error('Required tables do not exist. Please publish and run migrations first:');
+                $this->line('php artisan vendor:publish --tag=jp-postal-codes-migrations');
+                $this->line('php artisan migrate');
+                return Command::FAILURE;
+            }
+
             // 1. Truncate tables if they exist to ensure clean data
             $this->truncateTables();
             
@@ -49,21 +55,11 @@ class UpdatePostalCodesCommand extends Command
             // 3. Generate prefectures and cities from postal code data
             $this->generatePrefecturesFromPostalCodes();
             $this->generateCitiesFromPostalCodes();
-            
-            DB::commit();
 
             $this->info('Update completed successfully!');
             
-            // Display publish instructions if config file doesn't exist
-            if (!file_exists(config_path('jp-postal-codes.php'))) {
-                $this->comment('');
-                $this->comment('To customize table names, publish the config file:');
-                $this->comment('php artisan vendor:publish --tag=jp-postal-codes-config');
-            }
-            
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            DB::rollBack();
             $this->error('Error during update: ' . $e->getMessage());
             
             // Show detailed error information in verbose mode
@@ -77,6 +73,37 @@ class UpdatePostalCodesCommand extends Command
             
             return Command::FAILURE;
         }
+    }
+
+    /**
+     * Check if required tables exist
+     *
+     * @return bool
+     */
+    private function tablesExist()
+    {
+        $postalCodesTable = config('jp-postal-codes.tables.postal_codes', 'jp_postal_codes');
+        $prefecturesTable = config('jp-postal-codes.tables.prefectures', 'jp_prefectures');
+        $citiesTable = config('jp-postal-codes.tables.cities', 'jp_cities');
+        
+        $schema = Schema::getConnection()->getDoctrineSchemaManager();
+        $tables = $schema->listTableNames();
+        
+        $prefix = DB::getTablePrefix();
+        
+        $prefixedTables = [
+            $prefix . $postalCodesTable,
+            $prefix . $prefecturesTable,
+            $prefix . $citiesTable
+        ];
+        
+        foreach ($prefixedTables as $table) {
+            if (!in_array($table, $tables)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
