@@ -55,11 +55,17 @@ class UpdatePostalCodesCommand extends Command
             // 3. Generate prefectures and cities from postal code data
             $this->generatePrefecturesFromPostalCodes();
             $this->generateCitiesFromPostalCodes();
+            
+            // 4. Clean up downloaded files
+            $this->cleanupDownloadedFiles();
 
             $this->info('Update completed successfully!');
             
             return Command::SUCCESS;
         } catch (\Exception $e) {
+            // Clean up downloaded files even on error
+            $this->cleanupDownloadedFiles();
+            
             $this->error('Error during update: ' . $e->getMessage());
             
             // Show detailed error information in verbose mode
@@ -275,5 +281,38 @@ class UpdatePostalCodesCommand extends Command
         $bar->finish();
         $this->newLine();
         $this->info('Successfully generated ' . count($cityData) . ' cities from postal code data.');
+    }
+
+    /**
+     * Clean up downloaded files after processing
+     *
+     * @return void
+     */
+    private function cleanupDownloadedFiles()
+    {
+        $zipFilePath = storage_path('app/jp-postal-codes/' . PostalCodeService::ZIP_FILE_NAME);
+        
+        if (file_exists($zipFilePath)) {
+            // Attempt to delete the zip file
+            try {
+                unlink($zipFilePath);
+                if ($this->getOutput()->isVerbose()) {
+                    $this->info('Successfully removed downloaded file: ' . $zipFilePath);
+                }
+            } catch (\Exception $e) {
+                $this->warn('Failed to remove downloaded file: ' . $zipFilePath);
+                if ($this->getOutput()->isVerbose()) {
+                    $this->warn('Error: ' . $e->getMessage());
+                }
+            }
+        }
+        
+        // Also clean temporary files that might have been created
+        $tempFiles = glob(sys_get_temp_dir() . '/postal_code_*');
+        foreach ($tempFiles as $tempFile) {
+            if (is_file($tempFile) && is_writable($tempFile)) {
+                @unlink($tempFile);
+            }
+        }
     }
 }
