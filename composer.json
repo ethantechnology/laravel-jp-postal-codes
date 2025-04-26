@@ -1,0 +1,45 @@
+{
+    "name": "eta/japan-regions",
+    "description": "Laravel package for Japanese prefectures and postal codes",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ETA",
+            "email": "eta@ethan-tech.asia"
+        },
+        {
+            "name": "HaiHai",
+            "email": "devhaiho@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0",
+        "illuminate/database": "^7.0|^8.0|^9.0|^10.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0|^6.0|^7.0|^8.0",
+        "phpunit/phpunit": "^9.0|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eta\\JapanRegions\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Eta\\JapanRegions\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Eta\\JapanRegions\\JapanRegionsServiceProvider"
+            ]
+        }
+    }
+} 
