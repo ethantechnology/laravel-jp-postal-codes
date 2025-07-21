@@ -82,6 +82,18 @@ class PostalCode extends Model
     }
 
     /**
+     * Format postal code by removing hyphens and whitespace for search.
+     *
+     * @param  string  $postalCode
+     * @return string
+     */
+    public static function normalizePostalCode(string $postalCode): string
+    {
+        // Remove any existing hyphens and whitespace for search
+        return preg_replace('/[\s-]/', '', $postalCode);
+    }
+
+    /**
      * 郵便番号一致のスコープ
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -90,6 +102,9 @@ class PostalCode extends Model
      */
     public function scopePostal($query, $postalCode)
     {
-        return $query->where('postal_code', $postalCode);
+        // Normalize postal code by removing hyphens before search
+        $normalizedCode = self::normalizePostalCode($postalCode);
+        
+        return $query->where('postal_code', $normalizedCode);
     }
 } 
