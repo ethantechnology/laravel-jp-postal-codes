@@ -32,7 +32,7 @@ class Prefecture extends Model
      * @var array
      */
     protected $fillable = [
-        'id',
+        'code',
         'name'
     ];
 
@@ -42,6 +42,7 @@ class Prefecture extends Model
      * @var array
      */
     protected $guarded = [
+        'id',
         'deleted_at',
     ];
 
@@ -52,7 +53,7 @@ class Prefecture extends Model
      */
     public function postalCodes(): HasMany
     {
-        return $this->hasMany(PostalCode::class, 'prefecture_id', 'id');
+        return $this->hasMany(PostalCode::class, 'prefecture_code', 'code');
     }
 
     /**
@@ -62,6 +63,6 @@ class Prefecture extends Model
      */
     public function cities(): HasMany
     {
-        return $this->hasMany(City::class);
+        return $this->hasMany(City::class, 'prefecture_code', 'code');
     }
 } 

@@ -15,9 +15,12 @@ return new class extends Migration
     {
         Schema::create('jp_prefectures', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 10)->unique()->comment('都道府県コード');
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();
+            
+            $table->index('code');
         });
     }
 

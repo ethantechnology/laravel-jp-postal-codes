@@ -196,10 +196,10 @@ class UpdatePostalCodesCommand extends Command
         
         // Use raw SQL to efficiently extract and group prefecture data
         $prefectures = PostalCode::query()
-            ->selectRaw('prefecture_id as id, prefecture as name')
-            ->whereNotNull('prefecture_id')
+            ->selectRaw('prefecture_code as code, prefecture as name')
+            ->whereNotNull('prefecture_code')
             ->whereNotNull('prefecture')
-            ->groupBy('prefecture_id', 'prefecture')
+            ->groupBy('prefecture_code', 'prefecture')
             ->get();
             
         if ($prefectures->isEmpty()) {
@@ -211,7 +211,7 @@ class UpdatePostalCodesCommand extends Command
         $prefectureData = [];
         foreach ($prefectures as $prefecture) {
             $prefectureData[] = [
-                'id' => (int)$prefecture->id,
+                'code' => $prefecture->code,
                 'name' => $prefecture->name,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -242,11 +242,11 @@ class UpdatePostalCodesCommand extends Command
         
         // Use raw SQL to efficiently extract and group city data
         $cities = PostalCode::query()
-            ->selectRaw('address_code as id, prefecture_id, city as name')
+            ->selectRaw('address_code as code, prefecture_code, city as name')
             ->whereNotNull('address_code')
-            ->whereNotNull('prefecture_id')
+            ->whereNotNull('prefecture_code')
             ->whereNotNull('city')
-            ->groupBy('address_code', 'prefecture_id', 'city')
+            ->groupBy('address_code', 'prefecture_code', 'city')
             ->get();
             
         if ($cities->isEmpty()) {
@@ -258,8 +258,8 @@ class UpdatePostalCodesCommand extends Command
         $cityData = [];
         foreach ($cities as $city) {
             $cityData[] = [
-                'id' => $city->id,
-                'prefecture_id' => (int)$city->prefecture_id,
+                'code' => $city->code,
+                'prefecture_code' => $city->prefecture_code,
                 'name' => $city->name,
                 'created_at' => now(),
                 'updated_at' => now()

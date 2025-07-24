@@ -17,8 +17,8 @@ class PostalCode extends Model
      */
     public const COLUMNS = [
         'address_code',
-        'prefecture_id',
-        'city_id',
+        'prefecture_code',
+        'city_code',
         'area_code',
         'postal_code',
         'is_office',
@@ -68,7 +68,7 @@ class PostalCode extends Model
      */
     public function prefecture(): BelongsTo
     {
-        return $this->belongsTo(Prefecture::class, 'prefecture_id', 'id');
+        return $this->belongsTo(Prefecture::class, 'prefecture_code', 'code');
     }
 
     /**
@@ -78,7 +78,7 @@ class PostalCode extends Model
      */
     public function city(): BelongsTo
     {
-        return $this->belongsTo(City::class, 'city_id', 'id');
+        return $this->belongsTo(City::class, 'city_code', 'code');
     }
 
     /**

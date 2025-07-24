@@ -14,27 +14,6 @@ class City extends Model
     use SoftDeletes;
 
     /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * Create a new model instance.
      *
      * @param  array  $attributes
@@ -54,8 +33,8 @@ class City extends Model
      * @var array
      */
     protected $fillable = [
-        'id',
-        'prefecture_id',
+        'code',
+        'prefecture_code',
         'name'
     ];
 
@@ -65,6 +44,7 @@ class City extends Model
      * @var array
      */
     protected $guarded = [
+        'id',
         'deleted_at',
     ];
 
@@ -75,7 +55,7 @@ class City extends Model
      */
     public function prefecture(): BelongsTo
     {
-        return $this->belongsTo(Prefecture::class);
+        return $this->belongsTo(Prefecture::class, 'prefecture_code', 'code');
     }
 
     /**
@@ -85,6 +65,6 @@ class City extends Model
      */
     public function postalCodes(): HasMany
     {
-        return $this->hasMany(PostalCode::class, 'city_id', 'id');
+        return $this->hasMany(PostalCode::class, 'city_code', 'code');
     }
 } 
