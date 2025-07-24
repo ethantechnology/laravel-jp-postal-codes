@@ -196,10 +196,10 @@ class UpdatePostalCodesCommand extends Command
         
         // Use raw SQL to efficiently extract and group prefecture data
         $prefectures = PostalCode::query()
-            ->selectRaw('prefecture_code as id, prefecture as name')
-            ->whereNotNull('prefecture_code')
+            ->selectRaw('prefecture_id as id, prefecture as name')
+            ->whereNotNull('prefecture_id')
             ->whereNotNull('prefecture')
-            ->groupBy('prefecture_code', 'prefecture')
+            ->groupBy('prefecture_id', 'prefecture')
             ->get();
             
         if ($prefectures->isEmpty()) {
@@ -242,11 +242,11 @@ class UpdatePostalCodesCommand extends Command
         
         // Use raw SQL to efficiently extract and group city data
         $cities = PostalCode::query()
-            ->selectRaw('address_code as id, prefecture_code as prefecture_id, city as name')
+            ->selectRaw('address_code as id, prefecture_id, city as name')
             ->whereNotNull('address_code')
-            ->whereNotNull('prefecture_code')
+            ->whereNotNull('prefecture_id')
             ->whereNotNull('city')
-            ->groupBy('address_code', 'prefecture_code', 'city')
+            ->groupBy('address_code', 'prefecture_id', 'city')
             ->get();
             
         if ($cities->isEmpty()) {

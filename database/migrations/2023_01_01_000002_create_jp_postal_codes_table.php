@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('jp_postal_codes', function (Blueprint $table) {
             $table->id();
             $table->string('address_code', 20)->comment('全国地方公共団体コード');
-            $table->string('prefecture_code', 10)->comment('都道府県コード');
-            $table->string('city_code', 10)->comment('市区町村コード');
+            $table->unsignedBigInteger('prefecture_id')->comment('都道府県ID');
+            $table->string('city_id', 20)->comment('市区町村ID');
             $table->string('area_code', 20)->comment('町域コード');
             $table->string('postal_code', 7)->comment('郵便番号');
             $table->boolean('is_office')->default(false)->comment('事業所フラグ');
@@ -40,8 +40,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('postal_code');
-            $table->index('prefecture_code');
-            $table->index('city_code');
+            $table->index('prefecture_id');
+            $table->index('city_id');
         });
     }
 

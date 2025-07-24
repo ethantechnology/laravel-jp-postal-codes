@@ -52,7 +52,7 @@ class Prefecture extends Model
      */
     public function postalCodes(): HasMany
     {
-        return $this->hasMany(PostalCode::class, 'prefecture_code', 'id');
+        return $this->hasMany(PostalCode::class, 'prefecture_id', 'id');
     }
 
     /**

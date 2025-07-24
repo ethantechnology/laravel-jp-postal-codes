@@ -85,6 +85,6 @@ class City extends Model
      */
     public function postalCodes(): HasMany
     {
-        return $this->hasMany(PostalCode::class, 'city_code', 'id');
+        return $this->hasMany(PostalCode::class, 'city_id', 'id');
     }
 } 
