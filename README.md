@@ -65,9 +65,9 @@ php artisan migrate
 ```
 
 This will create the following tables:
-- `jp_prefectures`: Contains all Japanese prefectures (or your custom table name if configured)
-- `jp_cities`: Contains all Japanese cities/municipalities (or your custom table name if configured)
-- `jp_postal_codes`: Contains Japanese postal codes with their corresponding prefectures and cities (or your custom table name if configured)
+- `prefectures`: Contains all Japanese prefectures (or your custom table name if configured)
+- `cities`: Contains all Japanese cities/municipalities (or your custom table name if configured)
+- `postal_codes`: Contains Japanese postal codes with their corresponding prefectures and cities (or your custom table name if configured)
 
 ## Updating Postal Code Data
 

@@ -24,7 +24,7 @@ class City extends Model
         parent::__construct($attributes);
         
         // Set table name from config
-        $this->setTable(config('jp-postal-codes.tables.cities', 'jp_cities'));
+        $this->setTable(config('jp-postal-codes.tables.cities', 'cities'));
     }
 
     /**

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('jp_postal_codes', function (Blueprint $table) {
+        Schema::create('postal_codes', function (Blueprint $table) {
             $table->id();
             $table->string('address_code', 20)->comment('全国地方公共団体コード');
             $table->string('prefecture_code', 10)->comment('都道府県コード');
@@ -52,6 +52,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jp_postal_codes');
+        Schema::dropIfExists('postal_codes');
     }
 }; 

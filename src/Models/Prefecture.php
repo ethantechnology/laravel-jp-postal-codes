@@ -23,7 +23,7 @@ class Prefecture extends Model
         parent::__construct($attributes);
         
         // Set table name from config
-        $this->setTable(config('jp-postal-codes.tables.prefectures', 'jp_prefectures'));
+        $this->setTable(config('jp-postal-codes.tables.prefectures', 'prefectures'));
     }
 
     /**

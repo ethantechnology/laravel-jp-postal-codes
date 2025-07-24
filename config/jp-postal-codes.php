@@ -12,9 +12,9 @@ return [
     */
     
     'tables' => [
-        'prefectures' => 'jp_prefectures',
-        'cities' => 'jp_cities',
-        'postal_codes' => 'jp_postal_codes',
+        'prefectures' => 'prefectures',
+        'cities' => 'cities',
+        'postal_codes' => 'postal_codes',
     ],
     
     /*

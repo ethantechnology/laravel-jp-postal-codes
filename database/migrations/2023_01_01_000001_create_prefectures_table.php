@@ -13,16 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('jp_cities', function (Blueprint $table) {
+        Schema::create('prefectures', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 20)->unique()->comment('全国地方公共団体コード');
-            $table->string('prefecture_code', 10)->comment('都道府県コード');
-            $table->string('name', 50)->comment('市区町村名');
+            $table->string('code', 10)->unique()->comment('都道府県コード');
+            $table->string('name');
             $table->timestamps();
             $table->softDeletes();
             
             $table->index('code');
-            $table->index('prefecture_code');
         });
     }
 
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jp_cities');
+        Schema::dropIfExists('prefectures');
     }
 }; 

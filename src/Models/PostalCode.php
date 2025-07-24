@@ -51,7 +51,7 @@ class PostalCode extends Model
         parent::__construct($attributes);
         
         // Set table name from config
-        $this->setTable(config('jp-postal-codes.tables.postal_codes', 'jp_postal_codes'));
+        $this->setTable(config('jp-postal-codes.tables.postal_codes', 'postal_codes'));
     }
 
     /**
